@@ -11,6 +11,8 @@ class Config:
     TMM_ADMIN = os.environ.get('TMM_ADMIN') or "admin@themiddlemaan.com"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TMM_ADMIN_PASSWORD = os.environ.get('TMM_ADMIN_PASSWORD') or "12345"
+    SQLALCHEMY_COMMIT_ON_TEARDOWN = True
+    MAIL_PREFIX = '[TheMiddleMaan]'
 
     @staticmethod
     def init_app(app):
