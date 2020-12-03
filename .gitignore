@@ -1,3 +1,7 @@
+# Personally generated files
+f.txt
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
