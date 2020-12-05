@@ -10,7 +10,7 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY") or "7+/1@1m[[fvk$k@m??70[4o?aw/k4+sjhxj1%hxw[9ky2u2"
     TMM_ADMIN = os.environ.get('TMM_ADMIN') or "admin@themiddlemaan.com"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    TMM_ADMIN_PASSWORD = os.environ.get('TMM_ADMIN_PASSWORD') or "12345"
+    TMM_ADMIN_PASSWORD = os.environ.get('TMM_ADMIN_PASSWORD') or "fvk$k@m"
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     MAIL_PREFIX = '[TheMiddleMaan]'
 
@@ -20,17 +20,27 @@ class Config:
 
 
 class Development(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI")
+    username = os.environ.get('DB_USERNAME')
+    password = os.environ.get('DB_PASSWORD')
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI") or \
+        f"mysql+mysqlconnector://{username}:{password}@localhost/tmmdev"
     DEBUG = True
 
 
 class Testing(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI")
+    username = os.environ.get('DB_USERNAME')
+    password = os.environ.get('DB_PASSWORD')
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI") or \
+        f"mysql+mysqlconnector://{username}:{password}@localhost/tmmdev"
     TESTING = True
 
 
 class Production(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI")
+    username = os.environ.get('DB_USERNAME')
+    password = os.environ.get('DB_PASSWORD')
+    dbname = os.environ.get("DB_NAME")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI") or \
+        f"mysql+mysqlconnector://{username}:{password}@localhost/{dbname}"
 
 
 config = {
