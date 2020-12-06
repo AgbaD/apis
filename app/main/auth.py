@@ -128,3 +128,38 @@ def logout():
     return redirect(url_for('main.index'))
 
 
+@main.route("/change_password", methods=["GET", "POST"])
+def change_password():
+    if request.method == "POST":
+        email = request.form.get("email")
+        user = User.query.filter_by(email=email).first()
+        if not user:
+            flask("Account not found!")
+            return render_template("enter_email_change_password.html")
+
+        # create confirmation token
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=3600)
+        token = s.dumps({'reset': user.email})
+
+        send_mail("Reset Account Password", email/auth/change_password, user.email, user=user, token=token)
+        flash("Please check you email to reset your password!")
+        return redirect(url_for('main.login'))
+    return render_template("enter_email_change_password.html")
+
+
+@main.route("/reset_password/<token>", methods=['POST', 'GET'])
+def reset_password(token):
+    if request.method == "POST":
+        password = request.form.get("password")
+        repeat_password = request.form.get("repeat_password")
+        if password != repeat_password:
+            flash("Passwords do not match")
+            return render_template("reset_password.html", token=token)
+
+        result = User.reset_password(token, password)
+        if result:
+            flask("Password has been changed!")
+            return redirect(url_for('main.login'))
+        return render_template("reset_password.html", token=token)
+    return render_template("reset_password.html", token=token)
+
