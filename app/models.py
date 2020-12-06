@@ -17,7 +17,7 @@ class User(db.Model, UserMixin):
     firstname = db.Column(db.String(64))
     lastname = db.Column(db.String(64))
     address = db.Column(db.String)
-    notifications = db.Colums(db.PickleType())  # dict with key of timestamp and notifications as values
+    notifications = db.Column(db.PickleType())  # dict with key of timestamp and notifications as values
     admin = db.Column(db.Boolean, default=False)
     confirmed = db.Column(db.Boolean, default=False)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
