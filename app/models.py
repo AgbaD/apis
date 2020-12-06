@@ -14,14 +14,17 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     phone = db.Column(db.Integer)
-    confirmed = db.Column(db.Boolean, default=False)
     firstname = db.Column(db.String(64))
     lastname = db.Column(db.String(64))
-    admin = db.Column(db.Boolean, default=False)
-    created_on = db.Column(db.DateTime, default=datetime.utcnow)
     address = db.Column(db.String)
     notifications = db.Colums(db.PickleType())  # dict with key of timestamp and notifications as values
+    admin = db.Column(db.Boolean, default=False)
+    confirmed = db.Column(db.Boolean, default=False)
+    created_on = db.Column(db.DateTime, default=datetime.utcnow)
+    active = db.Column(db.Boolean, default=True)
+    role = db.Column(db.String)
     orders = db.relationship('Order', backref='user')
+    products = db.relationship('Product', backref='vendor')
     transactions = db.relationship('Transaction', backref='user')
 
     def __init__(self, **kwargs):
@@ -55,7 +58,7 @@ class Product(db.Model, UserMixin):
     description = db.Column(db.String)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     price = db.Column(db.Float)
-    vendor_id = db.Column(db.Integer, db.ForeignKey('vendor.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 @login_manager.user_loader
