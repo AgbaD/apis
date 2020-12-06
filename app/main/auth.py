@@ -34,7 +34,7 @@ def register_user():
         password = request.form.get("password")
         repeat_password = request.form.get("repeat_password")
         phone = request.form.get("phone")
-        address = request.form.get("address")
+        location = request.form.get("location")
 
         data = {
             "firstname": firstname, "lastname": lastname,
@@ -62,7 +62,7 @@ def register_user():
 
         user = User(email=email, firstname=firstname, lastname=lastname,
                     phone=phone, public_id=public_id, password=password_hash,
-                    address=address, role=role)
+                    location=location, role=role)
         db.session.add(user)
         db.session.commit()
 

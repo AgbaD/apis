@@ -31,7 +31,7 @@ userRegSchema = {
             "maxLength": 14,
             "minLength": 11
         },
-        "address": {
+        "location": {
             "type": "string"
         },
     },
