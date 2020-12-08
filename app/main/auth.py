@@ -156,7 +156,7 @@ def reset_password(token):
 
         if password != repeat_password:
             flash("Passwords do not match!")
-            return render_templete("reset_password.html", token=token)
+            return render_templete("reset_password.html", token=tokenn)
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(tokenn.encode('utf-8'))
@@ -168,7 +168,7 @@ def reset_password(token):
             flash('The reset link is invalid.')
             return redirect(url_for('main.login'))
         user.password = generate_password_hash(password)
-        db.session.add(commit)
+        db.session.add(user)
     return render_templete("reset_password.html", token=token)
 
 
