@@ -25,6 +25,7 @@ class User(db.Model, UserMixin):
     cart = db.Column(db.PickleType())
     referred_by = db.Column(db.String(50))
     role = db.Column(db.String(50))
+    reviews = db.relationship('Review', backref='user')
     orders = db.relationship('Order', backref='user')
     products = db.relationship('Product', backref='vendor')
     transactions = db.relationship('Transaction', backref='user')
@@ -68,6 +69,7 @@ class Product(db.Model, UserMixin):
     image = db.Column(db.LargeBinary)   # product image
     category = db.Column(db.String(50))
     quantity = db.Column(db.Integer)
+    reviews = db.relationship('Reviews', backref='product')
     vendor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, **kwargs):
