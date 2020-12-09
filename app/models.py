@@ -22,6 +22,7 @@ class User(db.Model, UserMixin):
     confirmed = db.Column(db.Boolean, default=False)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     active = db.Column(db.Boolean, default=True)
+    referred_by = db.Column(db.String(50))
     role = db.Column(db.String(50))
     orders = db.relationship('Order', backref='user')
     products = db.relationship('Product', backref='vendor')
@@ -58,7 +59,9 @@ class Product(db.Model, UserMixin):
     description = db.Column(db.String(256))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     price = db.Column(db.Float)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    category = db.Column(db.String(50))
+    quantity = db.Column(db.Integer)
+    vendor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
 @login_manager.user_loader
