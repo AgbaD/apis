@@ -22,6 +22,7 @@ class User(db.Model, UserMixin):
     confirmed = db.Column(db.Boolean, default=False)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     active = db.Column(db.Boolean, default=True)
+    cart = db.Column(db.PickleType())
     referred_by = db.Column(db.String(50))
     role = db.Column(db.String(50))
     orders = db.relationship('Order', backref='user')
@@ -52,16 +53,30 @@ class Order(db.Model, UserMixin):
         self.order_name = name+' #' + self.order_id
 
 
+product_categories = {}
+
+
 class Product(db.Model, UserMixin):
     __tablename__ = 'product'
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.String(50), unique=True)
-    description = db.Column(db.String(256))
+    name = db.Column(db.String(50))
+    long_description = db.Column(db.String(256))
+    short_description = db.Column(db.String(64))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     price = db.Column(db.Float)
+    image = db.Column(db.LargeBinary)   # product image
     category = db.Column(db.String(50))
     quantity = db.Column(db.Integer)
     vendor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    def __init__(self, **kwargs):
+        super(Product, self).__init__(**kwargs)
+        global product_categories
+        if self.category in product_categories:
+            product_categories[self.category] += 1
+        else:
+            product_categories[self.category] = 1
 
 
 @login_manager.user_loader
