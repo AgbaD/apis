@@ -17,12 +17,12 @@ class User(db.Model, UserMixin):
     firstname = db.Column(db.String(64))
     lastname = db.Column(db.String(64))
     location = db.Column(db.String(256))
-    notifications = db.Column(db.PickleType())  # dict with key of timestamp and notifications as values
+    notifications = db.Column(db.PickleType)  # dict with key of timestamp and notifications as values
     admin = db.Column(db.Boolean, default=False)
     confirmed = db.Column(db.Boolean, default=False)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     active = db.Column(db.Boolean, default=True)
-    cart = db.Column(db.PickleType())
+    cart = db.Column(db.PickleType)   # list of cart items
     referred_by = db.Column(db.String(50))
     role = db.Column(db.String(50))
     reviews = db.relationship('Review', backref='user')
@@ -43,7 +43,7 @@ class Order(db.Model, UserMixin):
     __tablename__ = 'order'
     id = db.Column(db.Integer, primary_key=True)
     order_name = db.Column(db.String(128))  # user name + order id
-    products = db.Column(db.PickleType())  # dict with key of timestamp and list of products as values
+    products = db.Column(db.PickleType)  # dict with key of timestamp and list of products as values
     order_id = db.Column(db.String(50), unique=True)
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -62,14 +62,15 @@ class Product(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.String(50), unique=True)
     name = db.Column(db.String(50))
-    long_description = db.Column(db.String(256))
+    tags = db.Column(db.PickleType)   # list of tags
     short_description = db.Column(db.String(64))
     created_on = db.Column(db.DateTime, default=datetime.utcnow)
     price = db.Column(db.Float)
     image = db.Column(db.LargeBinary)   # product image
+    purchases = db.Column(db.Integer)
     category = db.Column(db.String(50))
     quantity = db.Column(db.Integer)
-    reviews = db.relationship('Reviews', backref='product')
+    reviews = db.relationship('Review', backref='product')
     vendor_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, **kwargs):

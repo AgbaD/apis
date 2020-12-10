@@ -18,17 +18,37 @@ from datetime import datetime
 @main.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
-        pass
+        query = request.form.get("query")
+        products = Product.query.all()
+        searched_products = []
+        for product in products:
+            if product.name == query:
+                searched_products.append(product)
+            for tag in product.tags:
+                if tag == query:
+                    if product not in searched_products:
+                        searched_products.append(product)
+                    break
+        return render_template(url_for("search.html", products=searched_products))
     products = Product.query.all()
 
     # new arrivals
     now = datetime.utcnow()
     prod_time = {}
+    times = []
+    new_products = []
     for product in products:
         # get time difference between now and when product was created
-        pass
+        pass_time = now - product.created_on
+        prod_time[pass_time] = product
+        times.append(pass_time)
+    while len(new_products) < 4:
+        v = min(times)
+        if prod_time[v] not in new_products:
+            new_products.append(prod_time[v])
+        times.remove(v)
 
-    # get the top categories
+    # get the top categories based on quantity
     top_categories = []
     qty = [v for v in product_categories.values()]
     qty_sorted = sorted(qty)
@@ -44,8 +64,15 @@ def index():
         i += 1
 
     # best sellers
+    best_sellers = []
+    best_products = {product.purchases: product for product in products}
+    while len(best_sellers) < 4:
+        prod = max(best_products)
+        best_sellers.append(best_products[prod])
+        del[best_products[prod]]
 
-    return render_template('index.html', top_categories=top_categories)
+    return render_template('index.html', top_categories=top_categories,
+                           new_products=new_products, best_sellers=best_sellers)
 
 
 @main.route("/get_all_products")
@@ -57,11 +84,11 @@ def get_all_products():
 
 @main.route("/all_products/<category>")
 def get_category(category):
-    products = []
     all_products = Product.query.all()
-    for product in all_products:
+    products = [product for product in all_products if product.category == category]
+    """for product in all_products:
         if product.category == category:
-            products.append(product)
+            products.append(product)"""
     return render_template("category.html", products=products,
                            category=category)
 
@@ -69,8 +96,10 @@ def get_category(category):
 @main.route("/all_products/<product>/<short_des>")
 def get_product(product, short_des):
     products = Product.query.filter_by(name=product).all()
-    for product in products:
-        if product.short_description == short_des:
-            return render_template('product.html', product=product)
-        else:   # should not happen
-            return redirect(url_for("main.internal_server_error"))
+    try:
+        for product in products:
+            if product.short_description == short_des:
+                return render_template('product.html', product=product)
+        return redirect(url_for("main.internal_server_error"))  # should never happen
+    except:
+        return render_template('product.html', product=products)
