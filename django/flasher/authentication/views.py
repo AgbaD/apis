@@ -59,3 +59,13 @@ def change_password(request):
             user.save()
             return redirect('/user/page')
         return render(request, 'change_password.html')
+    return redirect('/')
+
+
+def delete_account(request):
+    if request.user.is_authenticated:
+        user = request.user
+
+        user_id = user.id
+        User.objects.filter(id=user_id).delete()
+    return redirect('/')

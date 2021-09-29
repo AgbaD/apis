@@ -15,14 +15,27 @@ def page(request):
             messages.info(request, 'You have not created any note')
 
         return render('page.html', {'notes': notes})
+    return redirect('/')
 
 
 def create_note(request):
-    if request.method == 'POST':
-        question = request.POST['question']
-        answer = request.POST['answer']
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            question = request.POST['question']
+            answer = request.POST['answer']
 
-        note = Note(question=question, answer=answer)
-        note.save()
-        return redirect('/user/page')
-    return render(request, 'create_note.html')
+            user_id = request.user.id
+
+            note = Note(user_id=user_id, question=question, answer=answer)
+            note.save()
+            messages.info(request, 'Note created!')
+            return redirect('/user/page')
+        return render(request, 'create_note.html')
+    return redirect('/')
+
+
+def delete_note(request):
+    if request.user.is_authenticated:
+        user_id = request.user.id
+
+    return redirect('/')
