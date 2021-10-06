@@ -18,7 +18,7 @@ def login(request):
 
         if user:
             auth.login(request, user)
-            return redirect('/user/dash')
+            return redirect('/usr/dash')
         messages.info(request, 'User credentials not correct!')
     return render(request, 'login.html')
 
@@ -46,7 +46,7 @@ def register(request):
         else:
             User.objects.create_user(username=username, first_name=firstname, last_name=lastname,
                                      email=email, password=password2)
-            return redirect('/user/dash')
+            return redirect('/usr/dash')
 
     return render(request, 'register.html')
 
