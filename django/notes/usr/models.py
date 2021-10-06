@@ -6,9 +6,9 @@ from datetime import datetime
 
 class Note(models.Model):
     title = models.CharField(max_length=53)
-    content = models.TextField
+    content = models.TextField(blank=True)
     date_created = models.DateTimeField(default=datetime.utcnow)
-    creator_id = models.IntegerField
+    creator = models.CharField(default='Anon', max_length=33)
     receiver_id = models.IntegerField(default=0)
     public_id = models.CharField(max_length=103)
 
