@@ -9,7 +9,9 @@ class Movie(models.Model):
     rating = models.IntegerField(default=0)
     director = models.CharField(max_length=100)
     public_id = models.CharField(max_length=300)
-    release_month = models.IntegerField(default=0)
+    release_date = models.DateTimeField(auto_now_add=True)
+    user_id = models.IntegerField(default=0)
+    price = models.FloatField(default=0.0)
 
     def __str__(self):
         return self.title
