@@ -33,6 +33,7 @@ def create_note(request):
     if request.method == 'POST':
         title = request.POST['title']
         content = request.POST['content']
+        summary = request.POST['summary']
         receiver_id = request.POST['receiver']
 
         public_id = str(uuid.uuid4())
@@ -41,6 +42,7 @@ def create_note(request):
         note = Note(
             title=title,
             content=content,
+            summary=summary,
             creator=creator,
             public_id=public_id,
             receiver_id=receiver_id

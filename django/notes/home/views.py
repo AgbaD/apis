@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
-
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -23,6 +23,7 @@ def login(request):
     return render(request, 'login.html')
 
 
+@login_required
 def logout(request):
     auth.logout(request)
     return redirect('/')
@@ -51,5 +52,17 @@ def register(request):
     return render(request, 'register.html')
 
 
+@login_required
 def change_password(request):
-    pass
+    if request.method == 'POST':
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+
+        if password1 != password2:
+            messages.info(request, "Passwords do not match")
+        else:
+            user = request.user
+            user.set_password([password2])
+            user.save()
+            return redirect('/usr/dash')
+    return render(request, "change_password.html")
