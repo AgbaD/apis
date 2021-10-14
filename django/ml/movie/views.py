@@ -165,4 +165,15 @@ class GetUsers(APIView):
 
     def get(self, request):
         users = User.objects.all()
+        all_users = []
+        for user in users:
+            user_dict = {
+                'user_name': user.username,
+                'firstname': user.first_name,
+                'lastname': user.last_name,
+                'id': user.id
+            }
+            all_users.append(user_dict)
+        return Response(all_users, status=status.HTTP_200_OK)
+
 

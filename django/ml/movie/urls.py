@@ -12,4 +12,5 @@ urlpatterns = [
     path('movie/<int:pk>/', views.GetMovie.as_view()),
     path('movie/create/', views.CreateMovie.as_view()),
     path('movie/<int:pk>/edit/', views.MovieView.as_view()),
+    path('user/all/', views.GetUsers.as_view()),
 ]
