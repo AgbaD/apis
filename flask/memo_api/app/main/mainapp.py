@@ -203,13 +203,12 @@ def get_memo(current_user, memo_id):
 @token_required
 def get_memos(current_user):
     try:
-        memos = Memo.query.all()
+        memos = Memo.query.filter_by(user_id=current_user.id).all()
 
         data = {}
         if memos:
             for memo in memos:
-                if memo.user_id == current_user.id:
-                    data[memo.id] = {"date": memo.date, "title": memo.title, "text": memo.text}
+                data[memo.id] = {"date": memo.date, "title": memo.title, "text": memo.text}
 
         return jsonify(data)
     except:
