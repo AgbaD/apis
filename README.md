@@ -1,7 +1,7 @@
 # APIs
-Here lies the abode of a collection of apis and web apps 
+Here, the abode of a collection of APIs and web apps 
 (without template files) which were written using flask 
-and django web frameworks
+and Django web frameworks
 
 The apis are divided into two groups based on
 the framework used and are listed below.
