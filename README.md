@@ -17,6 +17,12 @@ created by the user
 
   This is a single vendor ecommerce web app. The template files
 for this are not present
+ 
+ 
+- [Contact Validator](flask/con_val)
+
+  A simple email and phone number validator to check if an email
+is valid, or a phone number is Nigerian.
   
 
 ### Django APIs
