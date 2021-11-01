@@ -40,13 +40,16 @@ def create_server_client():
 def parse_number(number):
     url = "http://apilayer.net/api/validate"
     params = {
-        "access_key": os.environ.get("NUMVERIFY_KEY"),
+        "access_key": os.environ.get('NUMVERIFY_KEY'),
         "number": number
     }
     resp = requests.get(url, params=params)
     if resp.status_code != 200:
-        return None
+        return False, json.loads(resp.text)
     resp = json.loads(resp.text)
-    if not resp['valid']:
-        return None
-    return resp
+    try:
+        if not resp['valid']:
+            return False, resp
+    except:
+        return False, resp
+    return True, resp

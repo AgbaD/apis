@@ -8,8 +8,9 @@ import pytz
 import hashlib
 from functools import wraps
 from flask_cors import CORS
-from dotenv import load_dotenv
 from faunadb import query as q
+from dotenv import load_dotenv
+from faunadb.client import FaunaClient
 from datetime import datetime, timedelta
 from flask import Flask, request, jsonify
 from utils import create_server_client, parse_number
@@ -22,7 +23,10 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 CORS(app)
 
 # server client
-s_client = create_server_client()
+try:
+    s_client = create_server_client()
+except:
+    s_client = FaunaClient(secret=os.environ.get('FAUNA_SERVER_SECRET'))
 
 
 def token_required(f):
@@ -145,16 +149,24 @@ def email_val(user, email):
         }), 200
 
 
-@app.route("/info/<number>", methods=["GET"])
+@app.route("/info/<num>", methods=["GET"])
 @token_required
 def number(user, num):
-    result = parse_number(num)
-    if not result:
-        return jsonify({
-            'msg': 'error',
-            'detail': 'Could not get number info. Please check number and try again',
-            'side_note': 'If this happens a couple times, best believe my free plan for the month has expired'
-        }), 400
+    cond, result = parse_number(num)
+    if not cond:
+        try:
+            if not result['valid']:
+                return jsonify({
+                    'msg': 'error',
+                    'detail': 'Number is invalid. Please check number and try again',
+                }), 400
+        except:
+            return jsonify({
+                'msg': 'error',
+                'detail': 'Could not get number info. Please check number and try again',
+                'side_note': 'If this happens a couple times, best believe my free plan for the month has expired',
+                'full_error': result
+            }), 400
 
     s_client.query(q.create(
         q.collection("contacts"),
@@ -172,7 +184,7 @@ def number(user, num):
     }), 200
 
 
-@app.route("/user/contacts", methods=['GET'])
+@app.route("/user/contact", methods=['GET'])
 @token_required
 def user_contacts(user):
     contacts = s_client.query(q.get(q.match(
@@ -182,4 +194,4 @@ def user_contacts(user):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
