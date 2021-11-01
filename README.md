@@ -69,6 +69,9 @@ for this are not present
 
   - ####/user/contacts  [GET]
     Authentication Required
+
+
+    Get all user api calls and their results
   
   
 
