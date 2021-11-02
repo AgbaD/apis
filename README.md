@@ -27,7 +27,7 @@ for this are not present
   information about a mobile number.
   
   ### Endpoints
- - ####/register  [POST]
+  - ####/register  [POST]
     
 
     -d {"username":username, "password":"password"}
