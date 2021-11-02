@@ -187,9 +187,12 @@ def number(user, num):
 @app.route("/user/contact", methods=['GET'])
 @token_required
 def user_contacts(user):
-    contacts = s_client.query(q.get(q.match(
-        q.index("contacts_by_username"), user['data']['username']
-    )))
+    contacts = s_client.query(
+        q.map_(
+            q.paginate(q.match(q.index("contacts_by_username"), user['data']['username'])),
+            lambda x: q.get(x)
+        )
+    )
     print(contacts)
 
 
