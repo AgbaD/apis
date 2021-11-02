@@ -1,19 +1,19 @@
 #!/usr/bin/python3
 # Author:	@AgbaD | @agba_dr3
 
+import re
 import os
-import pytz
 import jwt
+import pytz
 import hashlib
-import datetime
-from flask import Flask, jsonify
-from flask_cors import CORS
-from dotenv import load_dotenv
 from functools import wraps
-
+from flask_cors import CORS
 from faunadb import query as q
-from faunadb.objects import Ref
+from dotenv import load_dotenv
 from faunadb.client import FaunaClient
+from datetime import datetime, timedelta
+from flask import Flask, request, jsonify
+from utils import create_server_client, parse_number
 
 load_dotenv()
 
@@ -22,35 +22,11 @@ app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 CORS(app)
 
-# admin client
-a_client = FaunaClient(secret=os.getenv('FAUNA_SECRET'))
-
-result = a_client.query(q.create_key({
-    {"database": q.database("contact_validator_app"), "role": "client"}}))
-client_secret = result['secret']
-
 # server client
-s_client = FaunaClient(secret=os.getenv('FAUNA_SERVER_SECRET'))
-
-s_client.query(q.create_collection({"name": "users"}))
-s_client.query(q.create_index(
-    {
-        "name": "users_by_username",
-        "source": q.collection("users"),
-        "permissions": {"read": "public"},
-        "terms": [{"field": ["data", "username"]}],
-        "unique": True
-    }
-))
-
-s_client.query(q.create_collection({"name": "Contacts"}))
-s_client.query(q.create_index(
-    {
-        "name": "contacts_by_id",
-        "source": q.collection("Contacts"),
-        "terms": [{"field": ["username", "contact", "id"]}]
-    }
-))
+try:
+    s_client = create_server_client()
+except:
+    s_client = FaunaClient(secret=os.environ.get('FAUNA_SERVER_SECRET'))
 
 
 def token_required(f):
@@ -77,7 +53,6 @@ def token_required(f):
             }), 401
 
         return f(user, *args, **kwargs)
-
     return decorated
 
 
@@ -92,12 +67,8 @@ def register():
     password = data['password']
 
     try:
-        user = s_client.query(
-            q.get(
-                q.match(q.index("users_by_username"), username)
-            )
-        )
-        return jsonify | ({
+        s_client.query(q.get(q.match(q.index("users_by_username"), username)))
+        return jsonify({
             "msg": "error",
             "detail": "Username has been used."
         }), 400
@@ -153,12 +124,77 @@ def login():
         }), 400
 
 
-@app.route("/contact/email", methods=['POST'])
-def email():
-    pass
+@app.route("/validate/<email>", methods=['GET'])
+@token_required
+def email_val(user, email):
+    pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    if not re.fullmatch(pattern, email):
+        return jsonify({
+            'msg': 'error',
+            'detail': 'Email is invalid'
+        }), 400
+    s_client.query(q.create(
+        q.collection("contacts"),
+        {
+            "data": {
+                "contact": email,
+                "username": user['data']['username'],
+                "result": "valid"
+            },
+        }
+    ))
+    return jsonify({
+            'msg': 'success',
+            'detail': 'Email is valid'
+        }), 200
 
-# check online for tests for emails and phone numbers
+
+@app.route("/info/<num>", methods=["GET"])
+@token_required
+def number(user, num):
+    cond, result = parse_number(num)
+    if not cond:
+        try:
+            if not result['valid']:
+                return jsonify({
+                    'msg': 'error',
+                    'detail': 'Number is invalid. Please check number and try again',
+                }), 400
+        except:
+            return jsonify({
+                'msg': 'error',
+                'detail': 'Could not get number info. Please check number and try again',
+                'side_note': 'If this happens a couple times, best believe my free plan for the month has expired',
+                'full_error': result
+            }), 400
+
+    s_client.query(q.create(
+        q.collection("contacts"),
+        {
+            "data": {
+                "contact": num,
+                "username": user['data']['username'],
+                "result": result
+            },
+        }
+    ))
+    return jsonify({
+        'msg': 'success',
+        'data': result
+    }), 200
+
+
+@app.route("/user/contact", methods=['GET'])
+@token_required
+def user_contacts(user):
+    contacts = s_client.query(
+        q.map_(
+            q.paginate(q.match(q.index("contacts_by_username"), user['data']['username'])),
+            lambda x: q.get(x)
+        )
+    )
+    print(contacts)
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)

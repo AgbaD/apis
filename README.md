@@ -21,8 +21,58 @@ for this are not present
  
 - [Contact Validator](flask/con_val)
 
-  A simple email and phone number validator to check if an email
-is valid, or a phone number is Nigerian.
+  #### Technologies: flask, numverify(API), faunadb
+  
+  A simple email  to check if an email is valid, and to give more
+  information about a mobile number.
+  
+  ### Endpoints
+ - ####/register  [POST]
+    
+
+    -d {"username":username, "password":"password"}
+  
+    returns: details
+
+  - ####/login  [POST]
+  
+  
+    -d {"username":username, "password":"password"}
+  
+    returns: token
+
+  - ####/validat/:email
+    Authentication Required
+
+
+    Replace ':email' with email
+
+
+    Find out if an email address is valid or not.
+    
+
+    -h {"x-access-token": token}
+
+  - ####/info/:number [GET]
+    Authentication Required
+    
+
+    Replace ':number' with the phone number
+
+
+    Get information about number. Phone number should be complete 
+    number without the plus sign. Eg '234812345678' instead of 
+    '+2348123456789'
+
+
+    -h {"x-access-token": token}
+
+  - ####/user/contacts  [GET]
+    Authentication Required
+
+
+    Get all user api calls and their results
+  
   
 
 ### Django APIs
