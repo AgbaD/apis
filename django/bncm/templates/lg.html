@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Bootstrap Css -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css"
+    rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x"
+    crossorigin="anonymous">
+
+    <title>Bincom Test | LGA</title>
+</head>
+<body style="display: flex; flex-direction: column; justify-content: center; align-items: center;
+height: 100vh; text-align: center;;">
+    <ul style="display: flex; justify-content: center; list-style: none; margin-bottom: 3rem">
+        <li><a style="text-decoration: none; padding: 1rem;" href="{% url 'pu' %}">Polling Units</a></li>
+        <li><a style="text-decoration: none; padding: 1rem;" href="{% url 'lg' %}">LGA</a></li>
+        <li><a style="text-decoration: none; padding: 1rem;" href="{% url 'party' %}">Parties</a></li>
+    </ul>
+    <div style="height:auto; width: auto; padding: 2rem; border: 1px solid #222222; border-radius: 5px;">
+        <form class="form">
+            <p>Local Government Areas</p>
+            <div class="form-group">
+                <p>Select preferred lga<p>
+                <select class="lga" id="lga" name="lga">
+                    <option selected>Click to select</option>
+                    {% for name in lga.keys %}
+                        <option value="{{ name }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group submit-btn">
+                <input type="submit" class="submit-btn__gg" id="submit" value="Get Result">
+            </div>
+        </form>
+
+        <div>
+            <p id="result_text"></p>
+        </div>
+    </div>
+<script>
+    document.querySelector('.form').addEventListener('submit',getResult);
+
+    function getResult(e) {
+        e.preventDefault()
+        var lga = document.getElementById('lga').value;
+
+        var data = JSON.parse("{{js_lga|escapejs}}");
+        var result = data[lga];
+
+        var res = document.getElementById('result_text');
+        res.innerHTML = result;
+    }
+</script>
+</body>
+</html>
