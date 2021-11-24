@@ -32,14 +32,15 @@ class User(BaseModel):
 
 @app.post("/login")
 def login(data: User):
+    pass
 
 
 @app.get("/questions/{category}")
 def get_questions(category: str, q: Optional[str] = "easy"):
     try:
         cat = categories[category]
-    except:
-        return {'status': 'error', 'details': 'Category is not valid'}
+    except Exception:
+        return {'status': 'error', 'details': 'category is not valid'}
 
     url = url_easy
     if q != "easy":
